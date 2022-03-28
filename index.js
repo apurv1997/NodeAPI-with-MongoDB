@@ -1,14 +1,18 @@
+// Required Libraries.
 const express = require("express");
 const mongoose = require("mongoose");
 const routes = require("./routes/routes")
 
+// MongoDB URL.
 const url = `mongodb+srv://users:users123@cluster0.6vrgh.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 
+// Connection Parameters for MongoDB.
 const connectionParams = {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 };
 
+//Connecting Mongoose with URL and connection parameters  
 mongoose
   .connect(url, connectionParams)
   .then(() => {
@@ -24,6 +28,7 @@ const app = express();
 app.use(express.json());
 app.use('/api', routes)
 
+// Server establish on portno: 3000.
 app.listen(3000, () => {
   console.log(`Server started at ${3000}`);
 });
