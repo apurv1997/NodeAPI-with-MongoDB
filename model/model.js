@@ -1,5 +1,7 @@
+// Import Mongoose library.
 const mongoose = require("mongoose");
 
+// Construct data Schema for MongoDB.
 const dataSchema = new mongoose.Schema({
   UniqueID: {
     required: true,
