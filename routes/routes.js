@@ -23,14 +23,16 @@ const middleware = function (req, res, next) {
   console.log(req.headers.hash);
 
   let hmacDigest = "";
-  /*
+  /* Base64:
    * Base64 is a group of binary-to-text encoding schemes that represent binary data
    * in sequences of 24 bits that can be represented by four 6-bit Base64 digits.
    *
+   * hmacSHA256:
    * The output hash is 256 bits in length.
    * An HMAC can be used to determine whether a message sent over an insecure channel
    * has been tampered with, provided that the sender and receiver share a secret key.
    *
+   * JSON.stringify():
    * A common use of JSON is to exchange data to/from a web server.
    * When sending data to a web server, the data has to be a string.
    * Convert a JavaScript object into a string with JSON.stringify().
@@ -38,7 +40,7 @@ const middleware = function (req, res, next) {
   hmacDigest = Base64.stringify(hmacSHA256(JSON.stringify(req.body), "12345"));
   console.log(hmacDigest);
 
-  //comparing request header hash with hmacDigest.
+  //comparing header hash value with hmacSHA(JSON.stringify()).
   if (req.headers.hash == hmacDigest) {
     next();
   } else {
@@ -49,6 +51,11 @@ const middleware = function (req, res, next) {
 router.use(middleware);
 
 //Post Method
+/**
+ * The req.body property contains key-value pairs of data submitted in the request body. 
+ * By default, it is undefined.
+ * We enter the values in the key-value pair enter the data into the database. 
+ */
 router.post("/save_errorlog", async (req, res) => {
   const data = new Model({
     UniqueID: req.body.UniqueID,
@@ -71,6 +78,11 @@ router.post("/save_errorlog", async (req, res) => {
 });
 
 //Get Method
+/**
+ * In get method we are giving the values of 4 parameters:
+ * clientID, pageno, _fromdate, _todate.
+ * We set a limit of 5 that means every page containes the 5 data value pairs.
+ */
 router.post("/get_errorlog", async (req, res) => {
   try {
     var limit = 5;
@@ -79,8 +91,15 @@ router.post("/get_errorlog", async (req, res) => {
     var _fromdate = req.body.Fromdate;
     var _todate = req.body.Todate;
 
+    // Calculate skip and limit with PageNo and Size. Assign to the JSON Object.
     var limino = (pageno - 1) * limit;
 
+    /**
+     * $gte selects the documents where the value of the field is  >= a specified value.
+     * $lte selects the documents where the value of the field is <= the specified value.
+     * The .toISOString() method returns a string in simplified extended ISO format, 
+     * which is always 24 or 27 characters long (YYYY-MM-DDTHH:mm:ss.sssZ)
+     */
     const clientid = await Model.find({
       ClientID: clientID,
       Date: {
@@ -96,6 +115,7 @@ router.post("/get_errorlog", async (req, res) => {
     console.log(_fromdate);
     console.log(_todate);
 
+    // Return the clientid or send the error message. 
     const data = await Model.find();
     res.json(clientid);
   } catch (error) {
